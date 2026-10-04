@@ -34,8 +34,21 @@
 ## 📸 Preview
 
 <div align="center">
-  <img src="docs/preview.gif" alt="OneClick Translator Demo" width="100%" />
-  <p><i>▶ Demo: Hold single key to peek ➔ Auto-fetch on scroll ➔ Manga bubble adaptive overlay</i></p>
+  <h3>1. Instant Web Text Translation (Hold to Peek / Sticky Note)</h3>
+  <video src="https://github.com/user-attachments/assets/4e054b75-d73b-41b7-b36d-813658edfb60" controls width="100%">
+    Your browser does not support the video tag.
+  </video>
+  <p><i>▶ Demo: Hold key to peek ➔ Release to restore ➔ Switch skin styles on the fly</i></p>
+</div>
+
+<br>
+
+<div align="center">
+  <h3>2. Raw Manga & Image OCR (🧪 Experimental)</h3>
+  <video src="https://github.com/user-attachments/assets/191fc69c-ba86-4462-a257-148526287376" controls width="100%">
+    Your browser does not support the video tag.
+  </video>
+  <p><i>▶ Demo: Viewport slicing ➔ Bubble coordinate detection ➔ Non-destructive overlay</i></p>
 </div>
 
 ---

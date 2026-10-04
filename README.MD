@@ -34,10 +34,22 @@
 ## 📸 运行预览
 
 <div align="center">
-  <img src="docs/preview.gif" alt="OneClick Translator 演示" width="100%" />
-  <p><i>▶ 演示：单键按住即时预览 ➔ 页面滚动自动补翻 ➔ 漫画气泡自适应贴纸覆盖</i></p>
+  <h3>1. 网页文本即时秒翻 (单键按住 / 便签伴读)</h3>
+  <video src="https://github.com/user-attachments/assets/4e054b75-d73b-41b7-b36d-813658edfb60" controls width="100%">
+    您的浏览器不支持视频播放。
+  </video>
+  <p><i>▶ 演示：单键按住即时预览 ➔ 松手还原 ➔ 右键切换便签皮肤</i></p>
 </div>
 
+<br>
+
+<div align="center">
+  <h3>2. 生肉漫画图文识别 (🧪 实验性特性)</h3>
+  <video src="https://github.com/user-attachments/assets/191fc69c-ba86-4462-a257-148526287376" controls width="100%">
+    您的浏览器不支持视频播放。
+  </video>
+  <p><i>▶ 演示：视口切片提取 ➔ 气泡定位 ➔ 异步覆盖对白译文</i></p>
+</div>
 ---
 
 ## ✨ 核心特性与架构亮点
