@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OneClickTranslator</title>
+  <link rel="stylesheet" href="popup.css" />
+  <style>
+    /* 弹窗局部微调样式 */
+    .shortcut-box-new { display: flex; align-items: center; gap: 4px; }
+    .keycap-long { width: 44px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px 4px; font-size: 11px; font-family: monospace; outline: none; }
+    .btn-confirm { background: #10b981; color: white; border: none; border-radius: 4px; padding: 3px 8px; font-size: 11px; cursor: pointer; font-weight: bold; }
+    .btn-confirm:hover { background: #059669; }
+
+    .unified-card {
+      padding: 8px 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+    .card-row-mode { display: flex; justify-content: space-between; align-items: center; }
+    .card-col-mode { display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+
+    .meta-info { display: flex; flex-direction: column; gap: 2px; }
+    .card-subtitle { font-size: 11px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 190px; }
+    .domain-text { color: #0284c7; font-weight: 500; }
+
+    .lang-row { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 6px; }
+    .lang-select { flex: 1; padding: 4px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; background: #f8fafc; outline: none; }
+
+    .api-card-custom {
+      padding: 8px 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .api-title-row { display: flex; align-items: center; justify-content: space-between; }
+
+    /* 仅图片翻译专属绿色微胶囊 */
+    .oct-key-badge {
+      font-size: 10px;
+      background: #f0fdf4;
+      color: #16a34a;
+      border: 1px solid #bbf7d0;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .popup-footer-box {
+      margin-top: 4px;
+      padding-top: 6px;
+      border-top: 1px dashed #e2e8f0;
+      text-align: center;
+      font-size: 10px;
+      color: #94a3b8;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .footer-status { font-weight: 600; color: #64748b; }
+    .footer-links { display: flex; justify-content: center; align-items: center; gap: 6px; }
+    .footer-links a { color: #64748b; text-decoration: none; }
+    .footer-links a:hover { text-decoration: underline; color: #0284c7; }
+    .disclaimer { font-size: 9px; color: #94a3b8; line-height: 1.2; }
+  </style>
+</head>
+<body>
+  <div class="popup-container">
+    
+    <!-- 1. 顶部品牌与快捷键设置 -->
+    <header class="popup-header">
+      <div class="brand">
+        <span class="brand-name">OneClick</span>
+        <span class="brand-badge">PRO</span>
+      </div>
+      <div class="shortcut-box-new" title="设置呼出翻译的快捷键">
+        <span style="font-size: 11px; color: #64748b;" data-i18n="shortcutLabel">快捷键</span>
+        <input type="text" id="shortcut-key-input" value="`" class="keycap-long" maxlength="5" placeholder="`" />
+        <button id="shortcut-save-btn" class="btn-confirm" data-i18n="saveBtn">保存</button>
+      </div>
+    </header>
+
+    <!-- 2. 当前网站总开关 -->
+    <div class="unified-card">
+      <div class="card-row-mode">
+        <div class="meta-info">
+          <span class="card-title" data-i18n="enableSiteTitle">在此网站启用</span>
+          <span id="current-domain" class="card-subtitle domain-text">检测中...</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="site-master-toggle" />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 3. 悬浮球开关 -->
+    <div class="unified-card">
+      <div class="card-row-mode">
+        <div class="meta-info">
+          <span class="card-title" data-i18n="fabTitle">页面右侧悬浮球</span>
+          <span class="card-subtitle" data-i18n="fabDesc">常驻虚拟按键，点击快速翻译</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="fab-toggle" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 4. 翻译语言卡片 -->
+    <div class="unified-card">
+      <div class="card-col-mode">
+        <div class="card-title" style="font-size: 12px;" data-i18n="langTitle">🌐 翻译语言</div>
+        <div class="lang-row">
+          <select id="source-lang-select" class="lang-select">
+            <option value="auto" data-i18n="optAuto">自动识别 (Auto)</option>
+            <option value="en" selected>English</option>
+            <option value="ja">日本語</option>
+            <option value="zh">中文</option>
+          </select>
+          <span style="color: #94a3b8; font-size: 11px; font-weight: bold;">➔</span>
+          <select id="target-lang-select" class="lang-select">
+            <option value="zh" selected>中文 (Chinese)</option>
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. 工作模式分段选择器 -->
+    <div class="mode-segment-wrap">
+      <div class="mode-segment">
+        <button type="button" class="segment-btn active" data-mode="hold" id="btn-mode-hold" data-i18n="modeHold">
+          👁 按住预览
+        </button>
+        <button type="button" class="segment-btn" data-mode="toggle" id="btn-mode-toggle" data-i18n="modeToggle">
+          🔘 点击开关
+        </button>
+      </div>
+    </div>
+
+    <!-- 6. 独立 API 模式配置 -->
+    <div class="api-card-custom">
+      <div class="api-title-row">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="font-size: 12px; font-weight: 600;" data-i18n="apiTitle">🔑 独立 API 模式</span>
+          <span class="oct-key-badge" data-i18n="apiBadge">仅图片翻译需要</span>
+        </div>
+        <a id="get-key-link" href="https://ocr.space/OCRApi" target="_blank" style="font-size: 11px; color: #0284c7; text-decoration: none;" data-i18n="getKeyLink">获取免费 Key ↗</a>
+      </div>
+      
+      <div class="page-subrow" style="display: flex; gap: 6px; align-items: center;">
+        <select id="ocr-engine-select" class="provider-dropdown-mini lang-select" style="flex: 1;">
+          <option value="ocrspace">OCR.space (推荐免翻墙)</option>
+          <option value="baidu">百度智能云 OCR</option>
+          <option value="gemini">Google Gemini</option>
+          <option value="deepseek">DeepSeek (深度求索)</option>
+          <option value="openai">OpenAI (ChatGPT)</option>
+          <option value="claude">Anthropic Claude</option>
+          <option value="kimi">Kimi (月之暗面)</option>
+          <option value="qwen">通义千问 (Qwen)</option>
+        </select>
+        <span class="api-note" style="font-size: 11px; color: #64748b;" data-i18n="defaultKeyTag">自带 Key</span>
+      </div>
+      
+      <div class="page-row" style="display: flex; gap: 6px;">
+        <input type="password" id="api-key-input" class="api-input keycap-long" style="flex: 1; text-align: left;" placeholder="输入对应 API Key..." data-i18n-attr="placeholder:apiKeyPlaceholder" />
+        <button type="button" id="api-save-btn" class="btn-confirm" style="padding: 0 10px;" data-i18n="saveBtn">
+          保存
+        </button>
+      </div>
+      
+      <div id="api-status-tip" class="tip-text" style="font-size: 11px; color: #ef4444;" data-i18n="noKeyText">API 未配置</div>
+    </div>
+
+    <!-- 7. 底部状态与说明 -->
+    <footer class="popup-footer-box">
+      <div id="status-bar" class="footer-status" data-i18n="readyText">就绪</div>
+      <div class="footer-links">
+        <span>v1.2.0 Pro</span>
+        <span>•</span>
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer" data-i18n="feedback">问题反馈</a>
+        <span>•</span>
+        <span data-i18n="author">作者: kingcat666</span>
+      </div>
+      <div class="disclaimer" data-i18n="disclaimer">
+        免责声明：本扩展仅供学习交流使用，不存储或传播任何网络内容。
+      </div>
+    </footer>
+
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

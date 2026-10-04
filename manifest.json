@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "OneClick Translator",
+  "version": "1.0.0",
+  "description": "网页非侵入式双语辅助翻译扩展 (无冲突单键/悬浮球快速切换，支持文本秒翻与生肉漫画图文识别)",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "lib/idb-keyval.js",
+        "core/cache.js",
+        "core/translator.js",
+        "core/scanner.js",
+        "core/overlay.js",
+        "core/manga-sanitizer.js",
+        "content.js"
+      ],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "commands": {
+    "toggle-translation": {
+      "suggested_key": {
+        "default": "Alt+T",
+        "mac": "Alt+T"
+      },
+      "description": "切换翻译层显示/隐藏"
+    }
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}
